@@ -80,7 +80,6 @@
 									<button v-else v-on:click="priorityHigh(noteFilter)" class="disable col-xs-12">High</button>
 								</small>
 								<small class="col-6">Date: {{ noteFilter.date_creation }}</small>
-								<!-- <p>Complete: {{ note.state }}</p> -->
 							</div>							
 						</div>
 						<div class="col-1 icon-note">
@@ -191,12 +190,12 @@
 			}
 		},
 		mounted: function(){			
-			if (localStorage.getItem("notes") != null) {
-				this.notes = JSON.parse(localStorage.getItem("notes"));
-			}
+			// if (localStorage.getItem("notes") != null) {
+			// 	this.notes = JSON.parse(localStorage.getItem("notes"));
+			// }
 		},
 		updated: function() {
-			localStorage.setItem("notes", JSON.stringify(this.notes));
+			// localStorage.setItem("notes", JSON.stringify(this.notes));
 		}
 	}
 </script>
