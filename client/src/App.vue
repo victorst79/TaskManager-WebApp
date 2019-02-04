@@ -16,15 +16,12 @@
 					<li class="nav-item">
 						<a class="nav-link" href="#"><router-link to="/weather">Weather</router-link></a>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="#"><router-link to="/chat">Chat</router-link></a>
-					</li>
 				</ul>
 			</div>
 		</nav>
 	</div>
 	<router-view/>
-	<Footer></Footer>
+	<Footer></Footer>	
   </div>
 </template>
 
@@ -55,6 +52,7 @@
 
 <script>
 import Footer from '@/components/Footer.vue'
+
 export default {
 	name: 'index',
 	components: {

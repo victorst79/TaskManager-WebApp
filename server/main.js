@@ -8,7 +8,7 @@ app.get('/', function(req, res){
 
 // SOCKET.IO
 io.on('connection', function(socket){
-    
+    console.log("connected");
     socket.on('nick',function(nick){
         // console.log("user connected: "+nick);
         socket.broadcast.emit('nick',nick);
