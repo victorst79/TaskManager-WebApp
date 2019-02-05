@@ -21,7 +21,8 @@
 		</nav>
 	</div>
 	<router-view/>
-	<Footer></Footer>	
+	<Footer></Footer>
+	<Chat></Chat>
   </div>
 </template>
 
@@ -52,11 +53,13 @@
 
 <script>
 import Footer from '@/components/Footer.vue'
+import Chat from '@/components/Chat.vue'
 
 export default {
 	name: 'index',
 	components: {
-		Footer
+		Footer,
+		Chat
 	}
 }
 </script>

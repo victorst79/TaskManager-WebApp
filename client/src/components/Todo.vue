@@ -108,6 +108,15 @@
 				seekerTask: []
 			}
 		},
+    sockets: {
+        connect: function () {
+            console.log('socket connected')
+        },
+        notes: function (data) {
+			console.log('notes received')
+			this.notes = JSON.parse(data);
+        }
+    },
 		methods: {
 			countNotes: function(notes){
 				var result = 0;
@@ -196,6 +205,7 @@
 		},
 		updated: function() {
 			// localStorage.setItem("notes", JSON.stringify(this.notes));
+			this.$socket.emit('notes', JSON.stringify(this.notes));
 		}
 	}
 </script>
