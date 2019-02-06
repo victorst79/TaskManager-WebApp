@@ -205,7 +205,8 @@
 		},
 		updated: function() {
 			// localStorage.setItem("notes", JSON.stringify(this.notes));
-			this.$socket.emit('notes', JSON.stringify(this.notes));
+			var notes = this.notes;
+			this.$socket.emit('notes', JSON.stringify(notes));
 		}
 	}
 </script>

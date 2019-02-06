@@ -20,7 +20,9 @@
 			</div>
 		</nav>
 	</div>
-	<router-view/>
+	<keep-alive>
+		<router-view/>
+	</keep-alive>
 	<Footer></Footer>
 	<Chat></Chat>
   </div>
