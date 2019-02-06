@@ -1,5 +1,16 @@
 <template>
-	<div id="notes container">
+	<div id="notes container" v-if="user == ''">
+		<div class="card mx-auto" style="width: 18rem;">
+			<div class="card-body">
+				<h5 class="card-title">Todo Notes</h5>				
+					<div class="form-group">
+						<input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username" v-model="tempUser">
+					</div>
+				<button type="button" class="btn" v-on:click="newUser">Log In</button>
+			</div>
+		</div>
+	</div>
+	<div id="notes container" v-else>
 		<h2>{{ msg }}</h2>
 		<input id="newNote" type="text" class="form-control" placeholder="What do you want to remember?" 
 		v-model="newTask" 
@@ -35,8 +46,8 @@
 									<button v-if="note.priority == '3'" v-on:click="priorityHigh(note)" class="high col-xs-12">High</button>
 									<button v-else v-on:click="priorityHigh(note)" class="disable col-xs-12">High</button>
 								</small>
-								<small class="col-6">Date: {{ note.date_creation }}</small>
-								<!-- <p>Complete: {{ note.state }}</p> -->
+								<small class="col-3">Date: {{ note.date_creation }}</small>
+								<small class="col-3">Author: {{ note.author }}</small>
 							</div>							
 						</div>
 						<div class="col-1 icon-note">
@@ -101,11 +112,13 @@
 		},
 		data: function(){
 			return{
+				user: '',
+				tempUser: '',
 				notes: [],
 				newTask: "",
 				searchTask: "",
 				notesOrder: [],
-				seekerTask: []
+				seekerTask: [],
 			}
 		},
     sockets: {
@@ -115,7 +128,11 @@
         notes: function (data) {
 			console.log('notes received')
 			this.notes = JSON.parse(data);
-        }
+		},
+		actNotes: function (data) {
+			console.log('notes received')
+			this.notes = JSON.parse(data);
+		},
     },
 		methods: {
 			countNotes: function(notes){
@@ -133,8 +150,9 @@
 					var priority = parseInt((Math.random() * 3 ) + 1);
 					var date_creation = new Date().toLocaleString();
 					var state = false;
+					var author = this.user;
 
-					this.notes.push({task,priority,date_creation,state});
+					this.notes.push({task,priority,date_creation,state,author});
 				}
 				this.newTask = "";
 			},
@@ -165,6 +183,9 @@
 			},
 			priorityHigh: function(note){;
 				note.priority = "3";
+			},
+			newUser: function(){
+				this.user = this.tempUser;
 			}
 		},
 		computed: {
@@ -206,7 +227,7 @@
 		updated: function() {
 			// localStorage.setItem("notes", JSON.stringify(this.notes));
 			var notes = this.notes;
-			this.$socket.emit('notes', JSON.stringify(notes));
+			this.$socket.emit('newNotes', JSON.stringify(notes));
 		}
 	}
 </script>
@@ -315,6 +336,15 @@
 		align-items: center;
 		justify-content: center;
 		text-align: center;
+	}
+
+	.card{
+		margin-top: 50px;
+	}
+
+	.card button{
+		background-color:#00bb8b;
+		color: white;
 	}
 
 </style>

@@ -31,13 +31,22 @@ var notes = [
         task: "Node",
         priority: 3,
         date_creation: new Date().toLocaleString(),
-        state: false
+        state: false,
+        author: "Victor"
     },
     {
         task: "Vue",
         priority: 1,
         date_creation: new Date().toLocaleString(),
-        state: false
+        state: false,
+        author: "Victor"
+    },
+    {
+        task: "Angular",
+        priority: 2,
+        date_creation: new Date().toLocaleString(),
+        state: false,
+        author: "Victor"
     }
 ];
 
@@ -49,15 +58,13 @@ io.on('connection', function(socket){
     socket.emit('notes',JSON.stringify(notes));
     
     // RECEIVED JSON NOTES
-    socket.on('notes', function(data){
+    socket.on('newNotes', function(data){
        notes = JSON.parse(data);
     });   
 
     // socket.on('nick',function(nick){
     //     // console.log("user connected: "+nick);
     //     socket.broadcast.emit('nick',nick);
-       
-
     //     socket.on('chat message', function(msg){
     //         // console.log('message: ' + msg);
     //         io.emit('chat message', chatResponse = { 
