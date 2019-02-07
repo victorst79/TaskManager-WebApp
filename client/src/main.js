@@ -8,7 +8,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 require('vue2-animate/dist/vue2-animate.min.css')
 import VueSocketIO from 'vue-socket.io'
 import Chat from 'vue-beautiful-chat'
+import Notifications from 'vue-notification'
 
+Vue.use(Notifications)
 Vue.use(Chat)
 Vue.use(VueAxios, axios)
 Vue.use(new VueSocketIO({

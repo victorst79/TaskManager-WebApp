@@ -50,18 +50,40 @@ var notes = [
     }
 ];
 
+var participants = [
+    {
+        id: 'user1',
+        name: 'Matteo',
+        imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
+    }
+];
+
+
 // SOCKET.IO
 io.on('connection', function(socket){
-    console.log("connected");
+    console.log("New Conexion");
 
-    // EMIT JSON NOTES
-    socket.emit('notes',JSON.stringify(notes));
+    // USER LOGIN
+    socket.on('user',function(user){
+        console.log(user + " connected");
+        socket.broadcast.emit('newUser',user);
+        
+        // EMIT JSON NOTES
+        socket.emit('notes',JSON.stringify(notes));
     
-    // RECEIVED JSON NOTES
-    socket.on('newNotes', function(data){
-       notes = JSON.parse(data);
-    });   
+        // RECEIVED JSON NOTES
+        socket.on('newNotes', function(data){
+            notes = JSON.parse(data);
+            // ACT NOTES FOR ALL USERS
+            io.emit('actNotes',JSON.stringify(notes));
+        });
 
+        // DISCONNECTED
+        socket.on('disconnect', function(){
+            console.log(user + ' disconnected');
+            io.emit('userDisconnect',user);
+        });
+    });
     // socket.on('nick',function(nick){
     //     // console.log("user connected: "+nick);
     //     socket.broadcast.emit('nick',nick);
@@ -76,7 +98,7 @@ io.on('connection', function(socket){
     // });        
 
     // DISCONNECTED
-    socket.on('disconnect', function(){
-        console.log('user disconnected');
-    });    
+    // socket.on('disconnect', function(){
+    //     console.log('Anon disconnected');
+    // });    
 });

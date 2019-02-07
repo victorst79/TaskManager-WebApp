@@ -4,7 +4,7 @@
 			<div class="card-body">
 				<h5 class="card-title">Todo Notes</h5>				
 					<div class="form-group">
-						<input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username" v-model="tempUser">
+						<input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username" v-model="tempUser" @keypress.enter="nesUser">
 					</div>
 				<button type="button" class="btn" v-on:click="newUser">Log In</button>
 			</div>
@@ -90,7 +90,8 @@
 									<button v-if="noteFilter.priority == '3'" v-on:click="priorityHigh(noteFilter)" class="high col-xs-12">High</button>
 									<button v-else v-on:click="priorityHigh(noteFilter)" class="disable col-xs-12">High</button>
 								</small>
-								<small class="col-6">Date: {{ noteFilter.date_creation }}</small>
+								<small class="col-3">Date: {{ noteFilter.date_creation }}</small>
+								<small class="col-3">Author: {{ noteFilter.author }}</small>
 							</div>							
 						</div>
 						<div class="col-1 icon-note">
@@ -101,26 +102,27 @@
 			</li>
 			</transition-group>
 		</ul>
+		<notifications group="connections" />
 	</div>		
 </template>
 
 <script>
-	export default {
-		name: 'Todo',
-		props: {
-			msg: String
-		},
-		data: function(){
-			return{
-				user: '',
-				tempUser: '',
-				notes: [],
-				newTask: "",
-				searchTask: "",
-				notesOrder: [],
-				seekerTask: [],
-			}
-		},
+export default {
+	name: 'Todo',
+	props: {
+		msg: String
+	},
+	data: function(){
+		return{
+			user: '',
+			tempUser: '',
+			notes: [],
+			newTask: "",
+			searchTask: "",
+			notesOrder: [],
+			seekerTask: [],
+		}
+	},
     sockets: {
         connect: function () {
             console.log('socket connected')
@@ -130,106 +132,127 @@
 			this.notes = JSON.parse(data);
 		},
 		actNotes: function (data) {
-			console.log('notes received')
+			console.log('act received')
 			this.notes = JSON.parse(data);
 		},
-    },
-		methods: {
-			countNotes: function(notes){
-				var result = 0;
-				for(let i = 0; i < notes.length; i++){
-					if(notes[i].state == false){
-						result++;
-					}
-				}
-				return result;
-			},
-			newNote: function(){
-				if(this.newTask != ""){
-					var task = this.newTask;
-					var priority = parseInt((Math.random() * 3 ) + 1);
-					var date_creation = new Date().toLocaleString();
-					var state = false;
-					var author = this.user;
-
-					this.notes.push({task,priority,date_creation,state,author});
-				}
-				this.newTask = "";
-			},
-			deleteCompleteNotes: function(){
-				var notes = this.notes;
-				for(let i = notes.length-1; i >= 0; i--){
-					if(notes[i].state == true){
-						notes.splice(i,1);
-					}
-				}
-			},
-			deleteNotes: function(note){
-				var notes = this.notes;
-				for(let i = 0; i < notes.length; i++){
-					if(notes[i] == note){
-						notes.splice(i,1);
-					}
-				}
-			},
-			changeStatus: function(note){
-				note.state = !note.state;
-			},
-			priorityLow: function(note){
-				note.priority = "1";
-			},
-			priorityNormal: function(note){
-				note.priority = "2";
-			},
-			priorityHigh: function(note){;
-				note.priority = "3";
-			},
-			newUser: function(){
-				this.user = this.tempUser;
-			}
+		newUser: function(data){
+			console.log(data);
+			this.$notify({
+				group: 'connections',
+				title: 'New user connection',
+				text: 'The user <b>'+ data +'</b> has connected'
+			});
 		},
-		computed: {
-			orderNotes: function(){
-				var notes = this.notes;				
-				this.notesOrder = [];
-				for(let i = 0; i < notes.length; i++){
-					if(notes[i].priority == 3){
-						this.notesOrder.push(notes[i]);
-					}
-				}
-				for(let i = 0; i < notes.length; i++){
-					if(notes[i].priority == 2){
-						this.notesOrder.push(notes[i]);
-					}
-				}
-				for(let i = 0; i < notes.length; i++){
-					if(notes[i].priority == 1){
-						this.notesOrder.push(notes[i]);
-					}
-				}
-				return this.notesOrder;
-			},
-			filteredList: function() {
-				if(this.searchTask == "" || this.searchTask == " "){
-					return null;
-				}else{
-					return this.notes.filter(note => {
-						return note.task.toLowerCase().includes(this.searchTask.toLowerCase());
-					})
-				}		
-			}
-		},
-		mounted: function(){			
-			// if (localStorage.getItem("notes") != null) {
-			// 	this.notes = JSON.parse(localStorage.getItem("notes"));
-			// }
-		},
-		updated: function() {
-			// localStorage.setItem("notes", JSON.stringify(this.notes));
-			var notes = this.notes;
-			this.$socket.emit('newNotes', JSON.stringify(notes));
+		userDisconnect: function(data){
+			this.$notify({
+				group: 'connections',
+				title: 'User Disconnected',
+				text: 'The user <b>'+ data +'</b> has desconnected'
+			});
 		}
+    },
+	methods: {
+		countNotes: function(notes){
+			var result = 0;
+			for(let i = 0; i < notes.length; i++){
+				if(notes[i].state == false){
+					result++;
+				}
+			}
+			return result;
+		},
+		newNote: function(){
+			if(this.newTask != ""){
+				var task = this.newTask;
+				var priority = parseInt((Math.random() * 3 ) + 1);
+				var date_creation = new Date().toLocaleString();
+				var state = false;
+				var author = this.user;
+
+				this.notes.push({task,priority,date_creation,state,author});
+			}
+			this.newTask = "";
+			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+		},
+		deleteCompleteNotes: function(){
+			var notes = this.notes;
+			for(let i = notes.length-1; i >= 0; i--){
+				if(notes[i].state == true){
+					notes.splice(i,1);
+				}
+			}
+			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+		},
+		deleteNotes: function(note){
+			var notes = this.notes;
+			for(let i = 0; i < notes.length; i++){
+				if(notes[i] == note){
+					notes.splice(i,1);
+				}
+			}
+			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+		},
+		changeStatus: function(note){
+			note.state = !note.state;
+			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+		},
+		priorityLow: function(note){
+			note.priority = "1";
+			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+		},
+		priorityNormal: function(note){
+			note.priority = "2";
+			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+		},
+		priorityHigh: function(note){;
+			note.priority = "3";
+			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+		},
+		newUser: function(){
+			this.user = this.tempUser;
+			this.$socket.emit('user', this.tempUser);
+		}
+	},
+	computed: {
+		orderNotes: function(){
+			var notes = this.notes;				
+			this.notesOrder = [];
+			for(let i = 0; i < notes.length; i++){
+				if(notes[i].priority == 3){
+					this.notesOrder.push(notes[i]);
+				}
+			}
+			for(let i = 0; i < notes.length; i++){
+				if(notes[i].priority == 2){
+					this.notesOrder.push(notes[i]);
+				}
+			}
+			for(let i = 0; i < notes.length; i++){
+				if(notes[i].priority == 1){
+					this.notesOrder.push(notes[i]);
+				}
+			}
+			return this.notesOrder;
+		},
+		filteredList: function() {
+			if(this.searchTask == "" || this.searchTask == " "){
+				return null;
+			}else{
+				return this.notes.filter(note => {
+					return note.task.toLowerCase().includes(this.searchTask.toLowerCase());
+				})
+			}		
+		}
+	},
+	mounted: function(){			
+		// if (localStorage.getItem("notes") != null) {
+		// 	this.notes = JSON.parse(localStorage.getItem("notes"));
+		// }
+	},
+	updated: function() {
+		// localStorage.setItem("notes", JSON.stringify(this.notes));
 	}
+}
 </script>
 
 <style scoped>
