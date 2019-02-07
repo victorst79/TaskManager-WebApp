@@ -70,13 +70,28 @@ io.on('connection', function(socket){
         
         // EMIT JSON NOTES
         socket.emit('notes',JSON.stringify(notes));
-    
+       
         // RECEIVED JSON NOTES
         socket.on('newNotes', function(data){
             notes = JSON.parse(data);
             // ACT NOTES FOR ALL USERS
             io.emit('actNotes',JSON.stringify(notes));
         });
+
+        // NOTIFY NEW NOTE
+        socket.on('newNoteNotify',function(data){
+            io.emit('newNoteNotify',data);
+        })
+
+        // NOTIFY DELETE NOTE
+        socket.on('deleteNoteNotify',function(data){
+            io.emit('deleteNoteNotify',data);
+        })
+
+        // NOTIFY DELETE COMPLETED NOTES
+        socket.on('deleteCompleteNoteNotify',function(data){
+            io.emit('deleteCompleteNoteNotify',data);
+        })
 
         // DISCONNECTED
         socket.on('disconnect', function(){

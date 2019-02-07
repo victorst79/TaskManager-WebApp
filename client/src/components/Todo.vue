@@ -4,7 +4,7 @@
 			<div class="card-body">
 				<h5 class="card-title">Todo Notes</h5>				
 					<div class="form-group">
-						<input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username" v-model="tempUser" @keypress.enter="nesUser">
+						<input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username" v-model="tempUser" @keypress.enter="newUser">
 					</div>
 				<button type="button" class="btn" v-on:click="newUser">Log In</button>
 			</div>
@@ -103,6 +103,7 @@
 			</transition-group>
 		</ul>
 		<notifications group="connections" />
+		<notifications group="notes" position="top center"/>
 	</div>		
 </template>
 
@@ -149,6 +150,28 @@ export default {
 				title: 'User Disconnected',
 				text: 'The user <b>'+ data +'</b> has desconnected'
 			});
+		},
+		newNoteNotify: function(data){
+			this.$notify({
+				group: 'notes',
+				title: 'User <b>'+ data.author +'</b> has created a new task.',
+				text: 'Task: '+data.task,
+				type: 'success'
+			});
+		},
+		deleteNoteNotify: function(){
+			this.$notify({
+				group: 'notes',
+				title: 'Note Deleted',
+				type: 'warn'
+			});
+		},
+		deleteCompleteNoteNotify: function(){
+			this.$notify({
+				group: 'notes',
+				title: 'Notes Completed Deleted',
+				type: 'warn'
+			});
 		}
     },
 	methods: {
@@ -173,6 +196,7 @@ export default {
 			}
 			this.newTask = "";
 			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+			this.$socket.emit('newNoteNotify',{task: task, author: author});
 		},
 		deleteCompleteNotes: function(){
 			var notes = this.notes;
@@ -182,6 +206,7 @@ export default {
 				}
 			}
 			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+			this.$socket.emit('deleteCompleteNoteNotify',true);
 		},
 		deleteNotes: function(note){
 			var notes = this.notes;
@@ -191,6 +216,7 @@ export default {
 				}
 			}
 			this.$socket.emit('newNotes', JSON.stringify(this.notes));
+			this.$socket.emit('deleteNoteNotify',true);
 		},
 		changeStatus: function(note){
 			note.state = !note.state;

@@ -16,6 +16,11 @@ export default new Router({
       path: '/weather',
       name: 'weather',
       component: Weather
+    },
+    {
+      path: '/*',
+      name: 'error',
+      component: Home
     }
   ]
 })
