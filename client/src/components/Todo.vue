@@ -2,7 +2,7 @@
 	<div id="notes container" v-if="user == ''">
 		<div class="card mx-auto" style="width: 18rem;">
 			<div class="card-body">
-				<h5 class="card-title">Todo Notes</h5>				
+				<h5 class="card-title" style="color:black;">Todo Notes</h5>				
 					<div class="form-group">
 						<input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username" v-model="tempUser" @keypress.enter="newUser">
 					</div>

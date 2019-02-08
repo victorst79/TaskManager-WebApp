@@ -80,7 +80,7 @@ io.on('connection', function(socket){
 
         // NOTIFY NEW NOTE
         socket.on('newNoteNotify',function(data){
-            io.emit('newNoteNotify',data);
+            socket.broadcast.emit('newNoteNotify',data);
         })
 
         // NOTIFY DELETE NOTE
