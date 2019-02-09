@@ -10,7 +10,7 @@
       :close="closeChat"
       :open="openChat"
       :showEmoji="true"
-      :showFile="true"
+      :showFile="false"
       :showTypingIndicator="showTypingIndicator"
       :colors="colors"
       :alwaysScrollToBottom="alwaysScrollToBottom"
@@ -23,39 +23,26 @@ export default {
   name: 'Chat',
   data() {
     return {
-      participants: [
-        {
-          id: 'user1',
-          name: 'Matteo',
-          imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
-        },
-        {
-          id: 'user2',
-          name: 'Support',
-          imageUrl: 'https://avatars3.githubusercontent.com/u/37018832?s=200&v=4'
-        }
-      ],
+      participants: [],
       titleImageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
-      messageList: [
-          { type: 'text', author: `me`, data: { text: `Say yes!` } },
-          { type: 'text', author: `user1`, data: { text: `No.` } }
-      ],
+      messageList: [],
+      userName: "",
       newMessagesCount: 0,
       isChatOpen: false,
       showTypingIndicator: '',
       colors: {
         header: {
-          bg: '#4e8cff',
+          bg: '#00bb8b',
           text: '#ffffff'
         },
         launcher: {
-          bg: '#4e8cff'
+          bg: '#00bb8b'
         },
         messageList: {
           bg: '#ffffff'
         },
         sentMessage: {
-          bg: '#4e8cff',
+          bg: '#00bb8b',
           text: '#ffffff'
         },
         receivedMessage: {
@@ -71,16 +58,34 @@ export default {
       messageStyling: true
     }
   },
+  sockets: {
+    chatUsers: function(data){
+      this.participants = JSON.parse(data);
+      this.$socket.emit('allParticipants', this.participants);
+    },
+    newUser:function(data){
+      this.userName = data;
+    },
+    initialMessages: function(data){
+      this.messageList = JSON.parse(data);
+    },
+    actMessagesList: function(data){
+      this.messageList = JSON.parse(data);
+    }
+  },
   methods: {
     sendMessage (text) {
       if (text.length > 0) {
         this.newMessagesCount = this.isChatOpen ? this.newMessagesCount : this.newMessagesCount + 1
-        this.onMessageWasSent({ author: 'support', type: 'text', data: { text } })
+        // this.onMessageWasSent({ author: this.userName, type: 'text', data: { text } });
+        console.log(this.user);
+        this.onMessageWasSent({type:"text",author: this.userName ,data:{text}});
       }
     },
     onMessageWasSent (message) {
       // called when the user sends a message
-      this.messageList = [ ...this.messageList, message ]
+      this.messageList = [ ...this.messageList, message ];
+      this.$socket.emit('newMessage',JSON.stringify(this.messageList));
     },
     openChat () {
       // called when the user clicks on the fab button to open the chat

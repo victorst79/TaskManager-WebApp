@@ -3,23 +3,22 @@ var app = express();
 
 // Settings for CORS
 app.use(function (req, res, next) {
+    // Website you wish to allow to connect
+    res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
 
-// Website you wish to allow to connect
-res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+    // Request methods you wish to allow
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
-// Request methods you wish to allow
-res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    // Request headers you wish to allow
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
 
-// Request headers you wish to allow
-res.header('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
 
-// Set to true if you need the website to include cookies in the requests sent
-// to the API (e.g. in case you use sessions)
-res.setHeader('Access-Control-Allow-Credentials', true);
-
-// Pass to next layer of middleware
-next();
-});
+    // Pass to next layer of middleware
+    next();
+}); 
 
 
 app.use(express.static(__dirname + '/public'));
@@ -49,15 +48,22 @@ var notes = [
         author: "Victor"
     }
 ];
-
 var participants = [
     {
         id: 'user1',
         name: 'Matteo',
         imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
+    },
+    {
+        id: 'user2',
+        name: 'Support',
+        imageUrl: 'https://avatars3.githubusercontent.com/u/37018832?s=200&v=4'
     }
 ];
-
+var messageList = [    
+    { type: 'text', author: `user2`, data: { text: `Say yes!` } },
+    { type: 'text', author: `user1`, data: { text: `No.` } }
+]
 
 // SOCKET.IO
 io.on('connection', function(socket){
@@ -67,7 +73,24 @@ io.on('connection', function(socket){
     socket.on('user',function(user){
         console.log(user + " connected");
         socket.broadcast.emit('newUser',user);
-        
+
+        // CHAT PARTICIPANTS INITIAL
+        io.emit('chatUsers', JSON.stringify([ ...participants,{id:user,name:user,imageUrl: 'https://easyeda.com/assets/static/images/avatar-default.png'}]));
+
+        // SEND ALL PARTICIPANT WHEN ANYONE CONNECTED TO CHAT
+        socket.on('allParticipants',function(data){
+            participants = data;
+        });
+
+        // CHAT MESSAGE LIST INITIAL
+        socket.emit('initialMessages',JSON.stringify(messageList));
+
+        // SEND NEW MESSAGES
+        socket.on('newMessage',function(data){
+            messageList = JSON.parse(data);
+            io.emit('actMessagesList',JSON.stringify(messageList));
+        });
+
         // EMIT JSON NOTES
         socket.emit('notes',JSON.stringify(notes));
        
@@ -99,21 +122,4 @@ io.on('connection', function(socket){
             io.emit('userDisconnect',user);
         });
     });
-    // socket.on('nick',function(nick){
-    //     // console.log("user connected: "+nick);
-    //     socket.broadcast.emit('nick',nick);
-    //     socket.on('chat message', function(msg){
-    //         // console.log('message: ' + msg);
-    //         io.emit('chat message', chatResponse = { 
-    //                 nick: nick,
-    //                 msg: msg
-    //             }               
-    //         );
-    //     });;
-    // });        
-
-    // DISCONNECTED
-    // socket.on('disconnect', function(){
-    //     console.log('Anon disconnected');
-    // });    
 });
