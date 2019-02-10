@@ -20,8 +20,9 @@ app.use(function (req, res, next) {
     next();
 }); 
 
-
+const formidableMiddleware = require('express-formidable');
 app.use(express.static(__dirname + '/public'));
+app.use(formidableMiddleware());
 var server = app.listen(3000);
 var io = require('socket.io').listen(server);
 
@@ -50,20 +51,26 @@ var notes = [
 ];
 var participants = [
     {
-        id: 'user1',
+        id: 'Matteo',
         name: 'Matteo',
         imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
     },
     {
-        id: 'user2',
+        id: 'Support',
         name: 'Support',
         imageUrl: 'https://avatars3.githubusercontent.com/u/37018832?s=200&v=4'
     }
 ];
 var messageList = [    
-    { type: 'text', author: `user2`, data: { text: `Say yes!` } },
-    { type: 'text', author: `user1`, data: { text: `No.` } }
+    { type: 'text', author: `Support`, data: { text: `Say yes!` } },
+    { type: 'text', author: `Matteo`, data: { text: `No.` } }
 ]
+
+// FILES
+app.post('/files', (req, res) => {
+    req.fields; // contains non-file fields
+    req.files; // contains files
+});
 
 // SOCKET.IO
 io.on('connection', function(socket){
@@ -73,6 +80,10 @@ io.on('connection', function(socket){
     socket.on('user',function(user){
         console.log(user + " connected");
         socket.broadcast.emit('newUser',user);
+
+
+        // ME USER CHAT
+        socket.emit('meNameChat',user);
 
         // CHAT PARTICIPANTS INITIAL
         io.emit('chatUsers', JSON.stringify([ ...participants,{id:user,name:user,imageUrl: 'https://easyeda.com/assets/static/images/avatar-default.png'}]));

@@ -2,9 +2,21 @@
 	<div id="notes container" v-if="user == ''">
 		<div class="card mx-auto" style="width: 18rem;">
 			<div class="card-body">
-				<h5 class="card-title" style="color:black;">Todo Notes</h5>				
+				<h5 class="card-title" style="color:black;">User</h5>				
 					<div class="form-group">
 						<input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username" v-model="tempUser" @keypress.enter="newUser">
+					</div>
+				<h5 class="card-title" style="color:black;">Avatar</h5>				
+					<div class="form-group">
+						<file-pond
+						name="test"
+						ref="pond"
+						label-idle="Drop files here..."					
+						allow-multiple="false"
+						accepted-file-types="image/jpeg, image/png"
+						server="/api"
+						v-bind:files="myFiles"
+						v-on:init="handleFilePondInit"/>
 					</div>
 				<button type="button" class="btn" v-on:click="newUser">Log In</button>
 			</div>
@@ -15,6 +27,15 @@
 		<input id="newNote" type="text" class="form-control" placeholder="What do you want to remember?" 
 		v-model="newTask" 
 		@keypress.enter="newNote">
+		<file-pond
+        name="test"
+        ref="pond"
+        label-idle="Drop files here..."
+        allow-multiple="true"
+        accepted-file-types="image/jpeg, image/png"
+        server="/api"
+        v-bind:files="myFiles"
+        v-on:init="handleFilePondInit"/>
 		<div class="dropdown-divider"></div>
 		<small> {{countNotes(notes)}} pending tasks of a total {{notes.length}} | <b v-on:click="deleteCompleteNotes">Delete completed tasks</b></small>
 		<div class="dropdown-divider"></div>		
@@ -108,6 +129,21 @@
 </template>
 
 <script>
+// Import Vue FilePond
+import vueFilePond from "vue-filepond";
+// Import FilePond styles
+import "filepond/dist/filepond.min.css";
+// Import image preview plugin styles
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
+// Import image preview and file type validation plugins
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+// Create component
+const FilePond = vueFilePond(
+  FilePondPluginFileValidateType,
+  FilePondPluginImagePreview
+);
+
 export default {
 	name: 'Todo',
 	props: {

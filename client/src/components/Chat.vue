@@ -63,7 +63,7 @@ export default {
       this.participants = JSON.parse(data);
       this.$socket.emit('allParticipants', this.participants);
     },
-    newUser:function(data){
+    meNameChat:function(data){
       this.userName = data;
     },
     initialMessages: function(data){
@@ -77,9 +77,7 @@ export default {
     sendMessage (text) {
       if (text.length > 0) {
         this.newMessagesCount = this.isChatOpen ? this.newMessagesCount : this.newMessagesCount + 1
-        // this.onMessageWasSent({ author: this.userName, type: 'text', data: { text } });
-        console.log(this.user);
-        this.onMessageWasSent({type:"text",author: this.userName ,data:{text}});
+        this.onMessageWasSent({ author: this.userName, type: 'text', data: { text } });
       }
     },
     onMessageWasSent (message) {
