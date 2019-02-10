@@ -3,7 +3,7 @@
         <div class="footer-copyright text-center py-3">
             <small>Developed by <a href="https://github.com/victorst79">Víctor Santaella Torres</a>.</small>
             <br>
-            <small>Code available on <a href="https://github.com/victorst79/todolist-vuejs"><i><img src="../assets/github.png"></i> Github</a></small>            
+            <small>Code available on <a href="https://github.com/victorst79/TaskManager-WebApp"><i><img src="../assets/github.png"></i> Github</a></small>            
         </div>
 	</footer>
 </template>
