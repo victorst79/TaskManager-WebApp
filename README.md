@@ -2,7 +2,7 @@
 
 ## Project based on the [Vue.js](https://vuejs.org/) Framework and [Node.js](https://nodejs.org/en/)
 
-[Live Project(Not Working)](#)
+[Demo Project](https://taskmanager-vue.herokuapp.com)
 
 ### Dependencies:
 
